@@ -27,12 +27,9 @@
 		</header>
 		<main>
 			<ul class="flex-container">
-				<div id="messages">
-
-				</div>
+				<div id="messages"></div>
 			</ul>
 			<ul class="flex-container">
-				
 				<!-- <button id="increment">+1</button> -->
 				<form id="message-form">
 					
@@ -49,6 +46,11 @@
 			<script id="message-template" type="text/html">
 				<div>
 					<p>{{ message }}</p>
+				</div>
+			</script>
+			<script id="location-message-template" type="text/html">
+				<div>
+					<p><a href="{{ url }}" target="_blank">My current location</a></p>
 				</div>
 			</script>
 			
