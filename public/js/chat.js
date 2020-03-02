@@ -1,30 +1,17 @@
 const socket = io()
 
-// socket.on('countUpdated', (count) => {
-// 	console.log('the count has been updated', count)
-// })
-
-// document.querySelector('#increment').addEventListener('click', () => {
-// 	console.log('clicked')
-// 	socket.emit('increment')
-// })
-
-// server (emit) -> client (receive) --acknowledgement -> server
-// client (emit) -> server (receive) --acknowledgement -> client
-
-
 // Elements
 const $messageForm = document.getElementById('message-form')
 const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $messages = document.getElementById('messages')
+const $locationButton = document.getElementById("loc");
 
 // Templates
 const $messageTemplate = document.getElementById('message-template').innerHTML
 const $locationMessageTemplate = document.getElementById('location-message-template').innerHTML
 
 socket.on('message', (message) => {
-	console.log(message)
 	const html = Mustache.render($messageTemplate, {
 		message: message.text,
 		createdAt: moment(message.createdAt).format('H:mm')
@@ -32,9 +19,10 @@ socket.on('message', (message) => {
 	$messages.insertAdjacentHTML('beforeend', html)
 })
 
-socket.on('locationMessage', (url) => {
+socket.on('locationMessage', (message) => {
 	const html = Mustache.render($locationMessageTemplate, {
-		url: url
+		url: message.url,
+		createdAt: moment(message.createdAt).format('H:mm')
 	})
 	$messages.insertAdjacentHTML('beforeend', html)
 })
@@ -55,11 +43,20 @@ $messageForm.addEventListener('submit', (e) => {
 		// cursor in input field
 		$messageFormInput.focus()
 		if(error) return console.log(error)
-		console.log('message delivered')
 	})
 })
 
-const $locationButton = document.getElementById('loc')
+$locationButton.addEventListener('click', () => {
+	$locationButton.setAttribute('disabled', 'disabled')
+	var myIp = myIP()
+	socket.emit('sendLocation', {
+		ip: myIp
+	}, () => {
+		$locationButton.removeAttribute('disabled')
+	})
+})
+
+/*
 $locationButton.addEventListener('click', () => {
 	if(!navigator.geolocation) return alert('Geolocation not supported by browser')
 	$locationButton.setAttribute('disabled', 'disabled')
@@ -68,8 +65,25 @@ $locationButton.addEventListener('click', () => {
 			latitude: position.coords.latitude,
 			longitude: position.coords.longitude
 		}, () => {
-			console.log('location shared')
 			$locationButton.removeAttribute('disabled')
 		})
 	})
-})
+})*/
+
+
+function myIP() {
+  if (window.XMLHttpRequest) xmlhttp = new XMLHttpRequest();
+  else xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+
+  xmlhttp.open("GET", "http://api.hostip.info/get_html.php", false);
+  xmlhttp.send();
+
+  hostipInfo = xmlhttp.responseText.split("\n");
+
+  for (i = 0; hostipInfo.length >= i; i++) {
+    ipAddress = hostipInfo[i].split(":");
+    if (ipAddress[0] == "IP") return ipAddress[1];
+  }
+
+  return false;
+}

@@ -3,7 +3,9 @@ const http = require('http')
 const path = require('path')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
-const { generateMessage } = require('./utils/messages')
+const { generateMessage, generateLocationMessage } = require('./utils/messages')
+var geoip = require("geoip-lite");
+const externalip = require("externalip");
 
 const app = express()
 const server = http.createServer(app)
@@ -21,7 +23,6 @@ app.use((req, res, next) => {
 
 app.use(express.static(publicDirectoryPath))
 
-// let count = 0
 io.on('connection', (socket) => {
 	socket.emit('message', generateMessage('Welcome'))
 
@@ -33,23 +34,40 @@ io.on('connection', (socket) => {
 		io.emit('message', generateMessage(message))
 		callback()
 	})
-	// socket.emit('countUpdated', count)
-	// socket.on('increment', () => {
-	// 	count++
-	// 	// socket.emit('countUpdated', count)
-	// 	io.emit('countUpdated', count)
-	// })
 
-	socket.on('sendLocation', (coords, callback) => {
-		io.emit('locationMessage', `https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
+/*	socket.on('sendLocation', (coords, callback) => {
+		// var url = codeLatLng(coords.latitude, coords.longitude)
+		console.log(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
+		io.emit('locationMessage', generateLocationMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
+		// io.emit('locationMessage', generateLocationMessage(url))
+		callback()
+	})*/
+
+	socket.on('sendLocation', (ip, callback) => {
+		const externalIp = new Promise((res, error) => {
+      		externalip(function(err, ip) {
+        	res(ip);
+      		});
+    	});
+		externalIp.then((res) => {
+  			console.log(res)
+  			var city = geoip.lookup(res).city
+			  console.log(city)
+			  io.emit("locationMessage", generateLocationMessage('near ' + city));
+		}).catch((err) => {
+			console.log('error', err)
+		})
+		
 		callback()
 	})
+
 
 	socket.on('disconnect', () => {
 		io.emit('message', generateMessage('a user has left'))
 	})
 
 })
+
 
 server.listen(port, () => {
 	console.log(`server is up on port ${port}`)
