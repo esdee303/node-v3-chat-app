@@ -11,6 +11,9 @@ const $locationButton = document.getElementById("loc");
 const $messageTemplate = document.getElementById('message-template').innerHTML
 const $locationMessageTemplate = document.getElementById('location-message-template').innerHTML
 
+// Options
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
+
 socket.on('message', (message) => {
 	const html = Mustache.render($messageTemplate, {
 		message: message.text,
@@ -55,6 +58,8 @@ $locationButton.addEventListener('click', () => {
 		$locationButton.removeAttribute('disabled')
 	})
 })
+
+socket.emit('join', { username, room })
 
 /*
 $locationButton.addEventListener('click', () => {

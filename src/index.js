@@ -24,14 +24,17 @@ app.use((req, res, next) => {
 app.use(express.static(publicDirectoryPath))
 
 io.on('connection', (socket) => {
-	socket.emit('message', generateMessage('Welcome'))
+		
+	socket.on('join', ({username, room}) => {
+		socket.join(room)
+		socket.emit('message', generateMessage('Welcome'))
+		socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined`))
+	})
 
-	socket.broadcast.emit('message', generateMessage('a new user has joined'))
-	
 	socket.on('sendMessage', (message, callback) => {
 		const filter = new Filter()
 		if(filter.isProfane(message)) return callback('profanity is not allowed')
-		io.emit('message', generateMessage(message))
+		io.to('Z').emit('message', generateMessage(message))
 		callback()
 	})
 
@@ -44,20 +47,15 @@ io.on('connection', (socket) => {
 	})*/
 
 	socket.on('sendLocation', (ip, callback) => {
-		const externalIp = new Promise((res, error) => {
-      		externalip(function(err, ip) {
-        	res(ip);
-      		});
-    	});
-		externalIp.then((res) => {
+		const city = new Promise((res, error) => {
+			res(geoip.lookup(ip.ip.trim()).city)
+		})
+		city.then((res) => {
   			console.log(res)
-  			var city = geoip.lookup(res).city
-			  console.log(city)
-			  io.emit("locationMessage", generateLocationMessage('near ' + city));
+  			io.emit("locationMessage", generateLocationMessage('near ' + res));
 		}).catch((err) => {
 			console.log('error', err)
 		})
-		
 		callback()
 	})
 
@@ -73,4 +71,8 @@ server.listen(port, () => {
 	console.log(`server is up on port ${port}`)
 })
 
+
+const city = new Promise((res, error) => {
+
+})
 
