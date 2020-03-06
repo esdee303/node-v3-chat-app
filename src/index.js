@@ -38,14 +38,6 @@ io.on('connection', (socket) => {
 		callback()
 	})
 
-/*	socket.on('sendLocation', (coords, callback) => {
-		// var url = codeLatLng(coords.latitude, coords.longitude)
-		console.log(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
-		io.emit('locationMessage', generateLocationMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
-		// io.emit('locationMessage', generateLocationMessage(url))
-		callback()
-	})*/
-
 	socket.on('sendLocation', (ip, callback) => {
 		const city = new Promise((res, error) => {
 			res(geoip.lookup(ip.ip.trim()).city)
@@ -69,10 +61,5 @@ io.on('connection', (socket) => {
 
 server.listen(port, () => {
 	console.log(`server is up on port ${port}`)
-})
-
-
-const city = new Promise((res, error) => {
-
 })
 
