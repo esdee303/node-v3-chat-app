@@ -1,7 +1,7 @@
 {
   "name": "realtime",
   "version": "1.0.0",
-  "description": "",
+  "description": "Realtime Chat app with Socket.io",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,7 +13,6 @@
   "dependencies": {
     "bad-words": "^3.0.3",
     "express": "^4.17.1",
-    "externalip": "^1.0.2",
     "geoip-lite": "^1.4.0",
     "nodemon": "^2.0.2",
     "socket.io": "^2.3.0"

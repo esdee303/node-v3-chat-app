@@ -59,7 +59,12 @@ $locationButton.addEventListener('click', () => {
 	})
 })
 
-socket.emit('join', { username, room })
+socket.emit('join', { username, room }, (error) => {
+	if(error) {
+		alert(error)
+		location.href = '/'
+	}
+})
 
 /*
 $locationButton.addEventListener('click', () => {
@@ -87,7 +92,10 @@ function myIP() {
 
   for (i = 0; hostipInfo.length >= i; i++) {
     ipAddress = hostipInfo[i].split(":");
-    if (ipAddress[0] == "IP") return ipAddress[1];
+    if (ipAddress[0] == "IP") {
+		console.log(ipAddress[0])
+		return ipAddress[1];
+	}
   }
 
   return false;
