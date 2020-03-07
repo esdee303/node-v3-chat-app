@@ -3,7 +3,7 @@ const users = []
 // add user
 const addUser = ({ id, username, room }) => {
 	// clean the data
-	username = username.trim().toLowerCase()
+	username = username.trim()
 	room = room.trim().toLowerCase()
 
 	// validate the data

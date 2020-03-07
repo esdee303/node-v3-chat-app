@@ -5,6 +5,7 @@ const $messageForm = document.getElementById('message-form')
 const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $messages = document.getElementById('messages')
+
 const $locationButton = document.getElementById("loc");
 
 // Templates
@@ -16,14 +17,18 @@ const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true }
 
 socket.on('message', (message) => {
 	const html = Mustache.render($messageTemplate, {
+		username: message.username,
 		message: message.text,
 		createdAt: moment(message.createdAt).format('H:mm')
 	})
 	$messages.insertAdjacentHTML('beforeend', html)
+	document.getElementById('messageText').style.fontStyle = 'italic'
+	
 })
 
 socket.on('locationMessage', (message) => {
 	const html = Mustache.render($locationMessageTemplate, {
+		username: message.username,
 		url: message.url,
 		createdAt: moment(message.createdAt).format('H:mm')
 	})
@@ -93,7 +98,7 @@ function myIP() {
   for (i = 0; hostipInfo.length >= i; i++) {
     ipAddress = hostipInfo[i].split(":");
     if (ipAddress[0] == "IP") {
-		console.log(ipAddress[0])
+		console.log(ipAddress[1])
 		return ipAddress[1];
 	}
   }
